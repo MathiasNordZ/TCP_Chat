@@ -8,4 +8,5 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include_directories(include)
 
 add_executable(client src/client/client.cc)
-add_executable(server src/server/server.cc)
+add_executable(server src/server/server.cc
+        src/server/server.h)

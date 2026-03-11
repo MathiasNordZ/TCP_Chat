@@ -1,10 +1,11 @@
+#include "server.h"
 #include "../../include/socket.h"
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <iostream>
-#include <vector>
 
 using namespace std;
+
+int main() {
+  server(8080);
+}
 
 int server(const int listenPort) {
   const int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -20,12 +21,10 @@ int server(const int listenPort) {
   }
 
   sockaddr_in serverAddr{};
-  serverAddr.sin_family = AF_INET;
-  serverAddr.sin_port = htons(listenPort);
-  serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+  createAddr(listenPort, serverAddr);
 
   errorCheck(bind(serverSocket, reinterpret_cast<sockaddr*>(&serverAddr),
-                 sizeof(serverAddr)), "Failed to bind serverSocket.");
+                  sizeof(serverAddr)), "Failed to bind serverSocket.");
 
   errorCheck(listen(serverSocket, 5), "Failed to listen to serverSocket.");
 
@@ -41,6 +40,21 @@ int server(const int listenPort) {
   cout << "Client connected!" << endl;
 
   char buffer[1024] = {};
+  serverLoop(clientSocket, buffer);
+
+  close(clientSocket);
+  close(serverSocket);
+  return 0;
+}
+
+void createAddr(int listenPort, sockaddr_in &serverAddr) {
+  serverAddr = {};
+  serverAddr.sin_family = AF_INET;
+  serverAddr.sin_port = htons(listenPort);
+  serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+}
+
+void serverLoop(const int clientSocket, char buffer[1024]) {
   while (true) {
     memset(buffer, 0, sizeof(buffer));
     const int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
@@ -59,12 +73,4 @@ int server(const int listenPort) {
     string response = "Message received: " + string(buffer);
     send(clientSocket, response.c_str(), response.length(), 0);
   }
-
-  close(clientSocket);
-  close(serverSocket);
-  return 0;
-}
-
-int main() {
-  server(8080);
 }
