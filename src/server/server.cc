@@ -21,8 +21,8 @@ int server(int listenPort) {
 
   errorCheck(listen(serverSocket, 5), "Failed to listen to serverSocket.");
 
+  int clientSocket = accept(serverSocket, nullptr, nullptr);
   while (true) {
-    int clientSocket = accept(serverSocket, nullptr, nullptr);
     if (clientSocket < 0) {
       perror("Failed to accept connection");
       continue;

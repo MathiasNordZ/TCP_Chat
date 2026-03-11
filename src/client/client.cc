@@ -13,12 +13,14 @@ int client(int port, const char* serverIP) {
 
     errorCheck(connect(clientSocket, reinterpret_cast<sockaddr*>(&serverAddr), sizeof(serverAddr)), "Failed to connect client to server");
 
-    const auto message = "Hello, server!";
-    send(clientSocket, message, strlen(message), 0);
+    while (true) {
+        char message[1024];
+        cin.getline(message, 1024);
+        send(clientSocket, message, strlen(message), 0);
+    }
 
-    close(clientSocket);
-
-    return 0;
+    //errorCheck(close(clientSocket), "Failed to close client socket.");
+    //return 0;
 }
 
 int main() {
