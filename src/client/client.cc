@@ -1,7 +1,4 @@
-#include "../../include/socket.h"
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <iostream>
+#include "tcpSocket.h"
 
 int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -15,15 +12,28 @@ int client(int port, const char* serverIP) {
 
     while (true) {
         char message[1024];
-        cin.getline(message, 1024);
+        std::cin.getline(message, 1024);
         send(clientSocket, message, strlen(message), 0);
     }
+}
 
-    //errorCheck(close(clientSocket), "Failed to close client socket.");
-    //return 0;
+std::tuple<int, const char*> userInput() {
+    int port;
+    std::string serverIP;
+
+    std::cout << "Please enter port to connect to:\n";
+    std::cin >> port;
+
+    std::cout << "Please enter IP address to connect to:\n";
+    std::cin >> serverIP;
+    const char* serverIPString = serverIP.c_str();
+
+    return std::make_tuple(port, serverIPString);
 }
 
 int main() {
-    client(8080, "127.0.0.1");
+    std::tuple<int, std::string> input = userInput();
+
+    client(std::get<0>(input), std::get<1>(input).c_str());
     return 0;
 }
