@@ -1,10 +1,4 @@
-#include "../../include/socket.h"
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <iostream>
-#include <vector>
-
-using namespace std;
+#include "tcpSocket.h"
 
 int server(const int listenPort) {
   const int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -29,7 +23,7 @@ int server(const int listenPort) {
 
   errorCheck(listen(serverSocket, 5), "Failed to listen to serverSocket.");
 
-  cout << "Server listening on port " << listenPort << "..." << endl;
+  std::cout << "Server listening on port " << listenPort << "..." << std::endl;
 
   const int clientSocket = accept(serverSocket, nullptr, nullptr);
   if (clientSocket < 0) {
@@ -38,25 +32,25 @@ int server(const int listenPort) {
     return -1;
   }
 
-  cout << "Client connected!" << endl;
+  std::cout << "Client connected!" << std::endl;
 
   char buffer[1024] = {};
   while (true) {
     memset(buffer, 0, sizeof(buffer));
-    const int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
+    const ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
 
     if (bytesRead < 0) {
       perror("Error receiving data");
       break;
     }
     if (bytesRead == 0) {
-      cout << "Client disconnected" << endl;
+      std::cout << "Client disconnected" << std::endl;
       break;
     }
 
-    cout << "Message from client: " << buffer << endl;
+    std::cout << "Message from client: " << buffer << std::endl;
 
-    string response = "Message received: " + string(buffer);
+    std::string response = "Message received: " + std::string(buffer);
     send(clientSocket, response.c_str(), response.length(), 0);
   }
 
@@ -65,6 +59,22 @@ int server(const int listenPort) {
   return 0;
 }
 
+int userInput() {
+  int port;
+  std::cout << "Please enter port to listen to:" << std::endl;
+  std::cin >> port;
+
+  if (port < 0 || port > 65535) {
+    return port;
+  }
+  return -1;
+}
+
 int main() {
-  server(8080);
+  const int port = userInput();
+
+  if (port == -1) {
+    return -1;
+  }
+  server(port);
 }
