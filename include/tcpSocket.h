@@ -5,17 +5,17 @@
 #ifndef TCP_CHAT_SOCKET_H
 #define TCP_CHAT_SOCKET_H
 
+#include <arpa/inet.h>
 #include <cstring>
 #include <iostream>
 #include <netinet/in.h>
+#include <string>
 #include <sys/socket.h>
 #include <unistd.h>
 
-using namespace std;
-
-int errorCheck(const int method, const string& errorCheck) {
+inline int errorCheck(const int method, const std::string& errorMessage) {
   if (method != 0) {
-    cout << "ERROR: " << errorCheck;
+    std::cout << "ERROR: " << errorMessage;
     return method;
   }
   return 0;
